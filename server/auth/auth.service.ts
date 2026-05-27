@@ -13,20 +13,18 @@ export class AuthService
 
     public async registerAccount(dto: RegisterDto)
     {
-        console.log("TEST1");
         if (await usernameAlreadyUsed(dto.username))
             throw new ConflictException("Username already taken");
-        console.log("TEST2");
         if (await emailAlreadyUsed(dto.email))
             throw new ConflictException("Email already taken");
-        console.log("TEST3");
-        const hashedPass = await bcrypt.hash(dto.password, this.configService.salt);
-        console.log("TEST4");
+
+        const salt = await bcrypt.genSalt(parseInt(this.configService.salt));
+        const hashedPass = await bcrypt.hash(dto.password, salt);
+
         await db.insert(accounts).values({
             username: dto.username,
             email: dto.email,
             password: hashedPass
         });
-        console.log("TEST5");
     }
 }

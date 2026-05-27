@@ -4,7 +4,6 @@ import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 // mini gestionnaire de packet pour tes endpoint 
 
-
 @Module({
     imports: [AppConfigModule],
     providers: [AuthService],

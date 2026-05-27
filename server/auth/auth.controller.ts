@@ -11,7 +11,6 @@ export class AuthController
     @HttpCode(HttpStatus.CREATED)
     public async register(@Body() dto: RegisterDto)
     {
-        console.log("controller")
         return await this.authService.registerAccount(dto);
     }
 }
