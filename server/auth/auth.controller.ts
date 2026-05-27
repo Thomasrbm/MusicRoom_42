@@ -1,6 +1,7 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post, Res } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./auth.types";
+import { FastifyReply } from "fastify";
 
 @Controller("auth")
 export class AuthController
@@ -9,8 +10,15 @@ export class AuthController
 
     @Post("register")
     @HttpCode(HttpStatus.CREATED)
-    public async register(@Body() dto: RegisterDto)
+    public async register(@Body() dto: RegisterDto,
+                          @Res({passthrough: true}) response: FastifyReply)
     {
-        return await this.authService.registerAccount(dto);
+        const jwt = await this.authService.registerAccount(dto);
+        response.setCookie("cookieJwt", jwt, {
+            httpOnly: true,
+            sameSite: "strict",
+            // secure: true   a mettre apres
+            path: "/",
+        });
     }
 }

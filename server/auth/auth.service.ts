@@ -5,13 +5,16 @@ import * as bcrypt from 'bcrypt';
 import { AppConfigService } from "../config/config.service";
 import { db } from "../database/db";
 import { accounts } from "../database/schema";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable({ scope: Scope.DEFAULT })
 export class AuthService
 {
-    constructor(private configService: AppConfigService) {}
+    constructor(private configService: AppConfigService,
+                private jwtService: JwtService
+    ) {}
 
-    public async registerAccount(dto: RegisterDto)
+    public async registerAccount(dto: RegisterDto): Promise<string>
     {
         if (await usernameAlreadyUsed(dto.username))
             throw new ConflictException("Username already taken");
@@ -21,10 +24,15 @@ export class AuthService
         const salt = await bcrypt.genSalt(parseInt(this.configService.salt));
         const hashedPass = await bcrypt.hash(dto.password, salt);
 
-        await db.insert(accounts).values({
+        const [payload] = await db.insert(accounts).values({
             username: dto.username,
             email: dto.email,
             password: hashedPass
-        });
+        }).returning({ puuid: accounts.puuid });
+
+        const jwt = this.jwtService.sign({ puuid: payload.puuid }, 
+                                         { expiresIn: this.configService.jwtExpiration as any });
+        
+        return jwt;
     }
 }

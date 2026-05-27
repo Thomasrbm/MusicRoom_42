@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
@@ -10,12 +11,13 @@ import { PasswordField } from "@/components/molecules/PasswordField";
 import { SocialButton } from "@/components/molecules/SocialButton";
 
 function RegisterForm() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{ confirmPassword?: string }>({});
+  const [errors, setErrors] = useState<{ confirmPassword?: string; server?: string }>({});
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,9 +28,27 @@ function RegisterForm() {
     }
     setErrors({});
     setIsLoading(true);
-    // TODO: connect to backend register endpoint
-    await new Promise((r) => setTimeout(r, 1000));
-    setIsLoading(false);
+
+    try {
+      const res = await fetch("/api/musicroom/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setErrors({ server: data.message ?? "Registration failed. Please try again." });
+        return;
+      }
+
+      router.push("/");
+    } catch {
+      setErrors({ server: "Unable to reach the server. Please try again." });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -95,6 +115,10 @@ function RegisterForm() {
           error={errors.confirmPassword}
           required
         />
+
+        {errors.server && (
+          <p className="text-sm text-red-400 text-center">{errors.server}</p>
+        )}
 
         <Button
           type="submit"
