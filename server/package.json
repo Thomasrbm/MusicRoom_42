@@ -5,6 +5,10 @@
   "main": "server.ts",
   "scripts": {
     "dev": "nodemon --exec ts-node server.ts --ext ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -17,6 +21,7 @@
     "@nestjs/core": "^11.1.21",
     "@nestjs/platform-fastify": "^11.1.21",
     "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.2",
     "drizzle": "^1.4.0",
     "drizzle-kit": "^0.31.10",
     "drizzle-orm": "^0.45.2",
