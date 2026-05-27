@@ -14,7 +14,11 @@
   "dependencies": {
     "@nestjs/common": "^11.1.21",
     "@nestjs/core": "^11.1.21",
-    "@nestjs/platform-fastify": "^11.1.21"
+    "@nestjs/platform-fastify": "^11.1.21",
+    "drizzle": "^1.4.0",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.9"
   },
   "devDependencies": {
     "@types/node": "^25.9.0",
