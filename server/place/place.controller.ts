@@ -1,9 +1,10 @@
 import {
   BadRequestException,
-  Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Req,
   UseGuards,
@@ -25,12 +26,12 @@ export class PlaceController {
 
   @Post("create")
   @HttpCode(HttpStatus.CREATED)
-  public async createPlace(@Req() request: FastifyRequest) {
+  public async createPlace(@Req() req: FastifyRequest) {
     const jwt = this.jwtService.decode(
-      request.cookies.cookieJwt || "",
+      req.cookies.cookieJwt || "",
     ) as JwtPayload;
 
-    const result = CreatePlaceDto.safeParse(request.body);
+    const result = CreatePlaceDto.safeParse(req.body);
 
     if (!result.success) {
       throw new BadRequestException(result.error);
@@ -46,12 +47,12 @@ export class PlaceController {
 
   @Post("join")
   @HttpCode(HttpStatus.CREATED)
-  public async joinPlace(@Req() request: FastifyRequest) {
+  public async joinPlace(@Req() req: FastifyRequest) {
     const jwt = this.jwtService.decode(
-      request.cookies.cookieJwt || "",
+      req.cookies.cookieJwt || "",
     ) as JwtPayload;
 
-    const result = JoinPlaceDto.safeParse(request.body);
+    const result = JoinPlaceDto.safeParse(req.body);
 
     if (!result.success) {
       throw new BadRequestException(result.error);
@@ -63,12 +64,12 @@ export class PlaceController {
 
   @Post("invite")
   @HttpCode(HttpStatus.CREATED)
-  public async inviteToPlace(@Req() request: FastifyRequest) {
+  public async inviteToPlace(@Req() req: FastifyRequest) {
     const jwt = this.jwtService.decode(
-      request.cookies.cookieJwt || "",
+      req.cookies.cookieJwt || "",
     ) as JwtPayload;
 
-    const result = InvitePlaceDto.safeParse(request.body);
+    const result = InvitePlaceDto.safeParse(req.body);
 
     if (!result.success) {
       throw new BadRequestException(result.error);
@@ -81,5 +82,15 @@ export class PlaceController {
       data.status,
       jwt.puuid,
     );
+  }
+
+  @Get("members/:placeId")
+  @HttpCode(HttpStatus.OK)
+  public async getPlaceMembers(
+    @Param("placeId") placeId: string,
+    @Req() req: FastifyRequest,
+  ) {
+    console.log(placeId);
+    return await this.placeService.getPlaceMembers(placeId);
   }
 }

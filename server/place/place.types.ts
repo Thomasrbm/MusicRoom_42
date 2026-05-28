@@ -19,3 +19,8 @@ export const InvitePlaceDto = z.object({
   targetId: z.string(),
   status: InviteStatus,
 });
+
+export interface PlaceMember {
+    accountId: string,
+    username: string
+}

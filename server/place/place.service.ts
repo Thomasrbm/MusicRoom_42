@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { db } from "../database/db";
-import { place, placeMember } from "../database/schema";
+import { accounts, place, placeMember } from "../database/schema";
 import {
   isInvitedToPlace,
   isPlaceHost,
@@ -14,6 +14,7 @@ import {
   isPlaceMember,
 } from "./place.utils";
 import { and, eq } from "drizzle-orm";
+import { PlaceMember } from "./place.types";
 
 @Injectable({ scope: Scope.DEFAULT })
 export class PlaceService {
@@ -93,5 +94,13 @@ export class PlaceService {
           ),
         );
     }
+  }
+
+  public async getPlaceMembers(placeId: string): Promise<PlaceMember[]> {
+    return await db
+      .select({ accountId: placeMember.accountId, username: accounts.username })
+      .from(placeMember)
+      .innerJoin(accounts, eq(placeMember.accountId, accounts.puuid))
+      .where(eq(placeMember.placeId, placeId));
   }
 }
