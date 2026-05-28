@@ -6,6 +6,7 @@ import {
 } from "@nestjs/platform-fastify";
 import { AppModule } from "./app.module";
 import fastifyCookie from "@fastify/cookie";
+import { IoAdapter } from "@nestjs/platform-socket.io";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -13,6 +14,7 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
+  app.useWebSocketAdapter(new IoAdapter(app));
   await app.register(fastifyCookie);
 
   app.setGlobalPrefix("/api/musicroom");
