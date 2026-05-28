@@ -28,11 +28,11 @@ function Header({ className }: HeaderProps) {
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600 group-hover:bg-purple-500 transition-colors">
-            <Music2 className="h-4 w-4 text-white" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1db954] group-hover:bg-[#1ed760] transition-colors">
+            <Music2 className="h-4 w-4 text-black" />
           </div>
           <span className="text-lg font-bold tracking-tight text-white">
-            Music<span className="text-purple-400">Room</span>
+            Music<span className="text-[#1db954]">Room</span>
           </span>
         </Link>
 
