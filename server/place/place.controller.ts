@@ -90,7 +90,6 @@ export class PlaceController {
     @Param("placeId") placeId: string,
     @Req() req: FastifyRequest,
   ) {
-    console.log(placeId);
     return await this.placeService.getPlaceMembers(placeId);
   }
 }
