@@ -8,3 +8,10 @@ export const accounts = pgTable("accounts", {
     password: text("password").notNull(),
     has2fa: boolean("has2fa").default(false)
 });
+
+export const place = pgTable("place", {
+    puuid: uuid("puuid").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    hostId: text("hostId").notNull().references(() => accounts.puuid),
+    isPublic: boolean("isPublic").notNull().default(true),
+});

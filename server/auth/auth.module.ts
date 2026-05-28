@@ -4,6 +4,7 @@ import { AppConfigService } from "../config/config.service";
 import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 import { JwtModule } from "@nestjs/jwt";
+import { JwtAuthGuard } from "./JwtAuthGuard";
 // mini gestionnaire de packet pour tes endpoint
 
 @Module({
@@ -18,7 +19,8 @@ import { JwtModule } from "@nestjs/jwt";
             }),
         }),
     ],
-    providers: [AuthService],
+    exports: [JwtModule],
+    providers: [AuthService, JwtAuthGuard],
     controllers: [AuthController]
 })
 export class AuthModule {}

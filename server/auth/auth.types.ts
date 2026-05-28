@@ -3,3 +3,7 @@ export interface RegisterDto {
     password: string;
     email: string;
 }
+
+export interface JwtPayload {
+    puuid: string;
+}

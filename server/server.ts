@@ -17,7 +17,6 @@ async function bootstrap() {
 
   app.setGlobalPrefix("/api/musicroom");
 
-  console.log(process.env.DATABASE_URL);
   await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();
