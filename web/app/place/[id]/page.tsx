@@ -6,15 +6,13 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/atoms/Button";
 import { IconButton } from "@/components/atoms/IconButton";
+import { InviteFriendsModal } from "@/components/organisms/InviteFriendsModal";
 import { Input } from "@/components/atoms/Input";
 import { TrackItem } from "@/components/molecules/TrackItem";
 import { MemberItem } from "@/components/molecules/MemberItem";
 import { ProgressBar } from "@/components/atoms/ProgressBar";
 import {
   ChevronLeft,
-  Play,
-  Pause,
-  SkipForward,
   Plus,
   Search,
   Share2,
@@ -23,7 +21,6 @@ import {
   Music,
   ListMusic,
   ThumbsUp,
-  MoreHorizontal,
 } from "lucide-react";
 
 // Mock data
@@ -80,19 +77,11 @@ export default function PlacePage({
       {/* Mobile Header */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 bg-[#121212]/95 px-4 backdrop-blur-md lg:hidden">
         <Link
-          href="/dashboard"
+          href="/"
           className="flex h-8 w-8 items-center justify-center rounded-full bg-[#000000]/70 text-white"
         >
           <ChevronLeft className="h-5 w-5" />
         </Link>
-        <div className="flex items-center gap-2">
-          <IconButton size="sm" variant="ghost">
-            <Share2 className="h-4 w-4" />
-          </IconButton>
-          <IconButton size="sm" variant="ghost">
-            <Settings className="h-4 w-4" />
-          </IconButton>
-        </div>
       </header>
 
       <div className="flex flex-1 flex-col lg:flex-row">
@@ -102,7 +91,7 @@ export default function PlacePage({
           <div className="relative bg-gradient-to-b from-[#535353] to-[#121212] px-4 pb-6 pt-4 lg:px-8 lg:pt-8">
             {/* Desktop Back Button */}
             <Link
-              href="/dashboard"
+              href="/"
               className="mb-4 hidden h-8 w-8 items-center justify-center rounded-full bg-[#000000]/50 text-white lg:flex"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -143,28 +132,7 @@ export default function PlacePage({
 
             {/* Play Controls */}
             <div className="mt-6 flex items-center gap-4">
-              <IconButton
-                size="lg"
-                variant="primary"
-                onClick={() => setIsPlaying(!isPlaying)}
-              >
-                {isPlaying ? (
-                  <Pause className="h-6 w-6" />
-                ) : (
-                  <Play className="h-6 w-6 ml-0.5" />
-                )}
-              </IconButton>
-              <IconButton size="md" variant="ghost">
-                <SkipForward className="h-6 w-6" />
-              </IconButton>
               <div className="ml-auto flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  <Share2 className="h-4 w-4" />
-                  <span className="hidden sm:inline">Share</span>
-                </Button>
-                <IconButton size="md" variant="ghost" className="hidden sm:flex">
-                  <MoreHorizontal className="h-5 w-5" />
-                </IconButton>
               </div>
             </div>
           </div>
@@ -287,10 +255,12 @@ export default function PlacePage({
                 ))}
             </div>
 
-            <Button variant="outline" className="mt-4 w-full">
-              <Plus className="h-4 w-4" />
-              Invite Friends
-            </Button>
+            <InviteFriendsModal placeId={id}>
+              <Button variant="outline" className="mt-4 w-full">
+                <Plus className="h-4 w-4" />
+                Invite Friends
+              </Button>
+            </InviteFriendsModal>
           </div>
         </aside>
       </div>

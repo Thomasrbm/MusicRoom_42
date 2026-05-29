@@ -27,3 +27,6 @@ lerna-debug.log*
 .claude
 
 .vscode
+
+.next
+node_modules
