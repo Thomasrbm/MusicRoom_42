@@ -38,7 +38,7 @@ export class PlaceController {
     }
 
     const data = result.data;
-    await this.placeService.createPlace(
+    return await this.placeService.createPlace(
       data.placeName,
       jwt.puuid,
       data.isPublic,

@@ -24,7 +24,7 @@ export class PlaceService {
     placeName: string,
     accountId: string,
     isPublic: boolean,
-  ) {
+  ): Promise<{ placeId: string }> {
     const [data] = await db
       .insert(place)
       .values({
@@ -39,6 +39,8 @@ export class PlaceService {
       placeId: data.placeId,
       isInvited: true,
     });
+
+    return { placeId: data.placeId };
   }
 
   public async joinPlace(placeId: string, accountId: string) {
