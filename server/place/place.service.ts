@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
   Scope,
   UnauthorizedException,
 } from "@nestjs/common";
@@ -14,7 +15,7 @@ import {
   isPlaceMember,
 } from "./place.utils";
 import { and, eq } from "drizzle-orm";
-import { PlaceMember } from "./place.types";
+import { PlaceInfo, PlaceMember } from "./place.types";
 
 @Injectable({ scope: Scope.DEFAULT })
 export class PlaceService {
@@ -24,7 +25,7 @@ export class PlaceService {
     placeName: string,
     accountId: string,
     isPublic: boolean,
-  ): Promise<{ placeId: string }> {
+  ): Promise<{ place: PlaceInfo }> {
     const [data] = await db
       .insert(place)
       .values({
@@ -34,13 +35,37 @@ export class PlaceService {
       })
       .returning({ placeId: place.puuid });
 
-    await db.insert(placeMember).values({
-      accountId: accountId,
-      placeId: data.placeId,
-      isInvited: true,
-    });
+    await db
+      .insert(placeMember)
+      .values({
+        accountId: accountId,
+        placeId: data.placeId,
+        isHost: true,
+        isInvited: true,
+      })
+      .returning();
 
-    return { placeId: data.placeId };
+    const [host] = await db
+      .select({
+        username: accounts.username,
+      })
+      .from(accounts)
+      .where(eq(accounts.puuid, accountId));
+
+    const hostData: PlaceMember = {
+      accountId: accountId,
+      username: host.username,
+      isHost: true,
+    };
+
+    return {
+      place: {
+        placeId: data.placeId,
+        placeName: placeName,
+        host: hostData,
+        members: [],
+      },
+    };
   }
 
   public async joinPlace(placeId: string, accountId: string) {
@@ -100,7 +125,11 @@ export class PlaceService {
 
   public async getPlaceMembers(placeId: string): Promise<PlaceMember[]> {
     return await db
-      .select({ accountId: placeMember.accountId, username: accounts.username })
+      .select({
+        accountId: placeMember.accountId,
+        username: accounts.username,
+        isHost: placeMember.isHost,
+      })
       .from(placeMember)
       .innerJoin(accounts, eq(placeMember.accountId, accounts.puuid))
       .where(eq(placeMember.placeId, placeId));

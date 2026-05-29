@@ -21,6 +21,14 @@ export const InvitePlaceDto = z.object({
 });
 
 export interface PlaceMember {
-    accountId: string,
-    username: string
+  accountId: string;
+  username: string;
+  isHost: boolean;
+}
+
+export interface PlaceInfo {
+  placeId: string;
+  placeName: string;
+  host: PlaceMember;
+  members: PlaceMember[];
 }

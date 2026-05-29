@@ -21,6 +21,7 @@ export const placeMember = pgTable("placeMember", {
     accountId: uuid("accountId").notNull().references(() => accounts.puuid),
     placeId: uuid("placeId").notNull().references(() => place.puuid),
     isInvited: boolean("isInvited").notNull().default(false),
+    isHost: boolean("isHost").notNull().default(false)
   },
   (table) => [primaryKey({
       columns: [table.accountId, table.placeId],
