@@ -2,65 +2,28 @@
 
 import * as React from "react";
 import { use } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/atoms/Button";
 import { IconButton } from "@/components/atoms/IconButton";
 import { InviteFriendsModal } from "@/components/organisms/InviteFriendsModal";
 import { Input } from "@/components/atoms/Input";
-import { TrackItem } from "@/components/molecules/TrackItem";
 import { MemberItem } from "@/components/molecules/MemberItem";
-import { ProgressBar } from "@/components/atoms/ProgressBar";
 import {
   ChevronLeft,
   Plus,
   Search,
-  Share2,
-  Settings,
   Users,
-  Music,
   ListMusic,
-  ThumbsUp,
 } from "lucide-react";
 
-// Mock data
-const placeData = {
-  id: "1",
-  name: "Late Night Vibes",
-  description: "Chill beats and good vibes for late night sessions",
-  memberCount: 12,
-  isLive: true,
-  host: { id: "u1", name: "Alex", avatar: undefined },
-};
+interface PlaceMember {
+  accountId: string;
+  username: string;
+  isHost: boolean;
+}
 
-const currentTrack = {
-  id: "t1",
-  title: "Blinding Lights",
-  artist: "The Weeknd",
-  albumArt: undefined,
-  duration: "3:20",
-  requestedBy: "Sarah",
-  votes: 8,
-};
-
-const queuedTracks = [
-  { id: "t2", title: "Levitating", artist: "Dua Lipa", duration: "3:23", requestedBy: "Mike", votes: 6 },
-  { id: "t3", title: "Save Your Tears", artist: "The Weeknd", duration: "3:35", requestedBy: "Alex", votes: 5 },
-  { id: "t4", title: "Peaches", artist: "Justin Bieber", duration: "3:18", requestedBy: "Emma", votes: 4 },
-  { id: "t5", title: "Good 4 U", artist: "Olivia Rodrigo", duration: "2:58", requestedBy: "James", votes: 3 },
-  { id: "t6", title: "Stay", artist: "The Kid LAROI", duration: "2:21", requestedBy: "Lisa", votes: 2 },
-];
-
-const members = [
-  { id: "u1", name: "Alex", isHost: true, isOnline: true },
-  { id: "u2", name: "Sarah", isHost: false, isOnline: true },
-  { id: "u3", name: "Mike", isHost: false, isOnline: true },
-  { id: "u4", name: "Emma", isHost: false, isOnline: true },
-  { id: "u5", name: "James", isHost: false, isOnline: true },
-  { id: "u6", name: "Lisa", isHost: false, isOnline: false },
-  { id: "u7", name: "Chris", isHost: false, isOnline: true },
-  { id: "u8", name: "Amy", isHost: false, isOnline: true },
-];
 
 export default function PlacePage({
   params,
@@ -68,9 +31,20 @@ export default function PlacePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const [isPlaying, setIsPlaying] = React.useState(true);
+  const searchParams = useSearchParams();
+  const placeName = searchParams.get("name") ?? id;
+  const [members, setMembers] = React.useState<PlaceMember[]>([]);
   const [activeTab, setActiveTab] = React.useState<"queue" | "members">("queue");
   const [searchQuery, setSearchQuery] = React.useState("");
+
+  React.useEffect(() => {
+    fetch(`/api/musicroom/place/members/${id}`, { credentials: "include" })
+      .then((r) => r.json())
+      .then((data: PlaceMember[]) => setMembers(data))
+      .catch(() => {});
+  }, [id]);
+
+  const host = members.find((m) => m.isHost);
 
   return (
     <div className="flex min-h-screen flex-col bg-[#121212]">
@@ -108,24 +82,23 @@ export default function PlacePage({
               {/* Place Info */}
               <div className="flex flex-col items-center gap-2 text-center sm:items-start sm:text-left">
                 <div className="flex items-center gap-2">
-                  {placeData.isLive && (
-                    <span className="flex items-center gap-1.5 rounded-sm bg-[#1db954] px-2 py-0.5 text-xs font-bold text-black">
-                      <span className="h-2 w-2 animate-pulse rounded-full bg-black" />
-                      LIVE
-                    </span>
-                  )}
+                  <span className="flex items-center gap-1.5 rounded-sm bg-[#1db954] px-2 py-0.5 text-xs font-bold text-black">
+                    <span className="h-2 w-2 animate-pulse rounded-full bg-black" />
+                    LIVE
+                  </span>
                   <span className="text-xs font-medium text-white uppercase">Place</span>
                 </div>
                 <h1 className="text-2xl font-bold text-white sm:text-4xl lg:text-5xl text-balance">
-                  {placeData.name}
+                  {placeName}
                 </h1>
-                <p className="max-w-md text-sm text-[#b3b3b3]">
-                  {placeData.description}
-                </p>
                 <div className="flex items-center gap-1 text-sm text-[#b3b3b3]">
-                  <span className="font-medium text-white">{placeData.host.name}</span>
-                  <span>-</span>
-                  <span>{placeData.memberCount} listeners</span>
+                  {host && (
+                    <>
+                      <span className="font-medium text-white">{host.username}</span>
+                      <span>·</span>
+                    </>
+                  )}
+                  <span>{members.length} {members.length === 1 ? "listener" : "listeners"}</span>
                 </div>
               </div>
             </div>
@@ -134,24 +107,6 @@ export default function PlacePage({
             <div className="mt-6 flex items-center gap-4">
               <div className="ml-auto flex items-center gap-2">
               </div>
-            </div>
-          </div>
-
-          {/* Now Playing */}
-          <div className="border-b border-[#282828] px-4 py-4 lg:px-8">
-            <div className="flex items-center gap-2 text-xs font-medium uppercase text-[#b3b3b3]">
-              <Music className="h-4 w-4" />
-              Now Playing
-            </div>
-            <div className="mt-3">
-              <TrackItem {...currentTrack} isPlaying />
-            </div>
-            <div className="mt-3 flex items-center gap-2 px-3">
-              <span className="text-xs text-[#b3b3b3]">1:23</span>
-              <div className="group flex-1">
-                <ProgressBar value={40} max={100} />
-              </div>
-              <span className="text-xs text-[#b3b3b3]">3:20</span>
             </div>
           </div>
 
@@ -180,6 +135,7 @@ export default function PlacePage({
             >
               <Users className="h-4 w-4" />
               Members ({members.length})
+
             </button>
           </div>
 
@@ -208,21 +164,10 @@ export default function PlacePage({
               />
             </div>
 
-            {/* Track List */}
-            <div className="flex flex-col gap-1">
-              {queuedTracks.map((track, index) => (
-                <div key={track.id} className="group flex items-center">
-                  <span className="w-8 text-center text-sm text-[#b3b3b3] group-hover:hidden">
-                    {index + 1}
-                  </span>
-                  <IconButton size="sm" variant="ghost" className="hidden w-8 group-hover:flex">
-                    <ThumbsUp className="h-4 w-4" />
-                  </IconButton>
-                  <div className="flex-1">
-                    <TrackItem {...track} />
-                  </div>
-                </div>
-              ))}
+            {/* Track List — empty until connected */}
+            <div className="flex flex-col items-center justify-center gap-2 py-12 text-[#727272]">
+              <ListMusic className="h-8 w-8" />
+              <p className="text-sm">No tracks yet. Add the first one!</p>
             </div>
           </div>
         </div>
@@ -237,21 +182,21 @@ export default function PlacePage({
               <Users className="h-5 w-5 text-[#1db954]" />
               Listeners
               <span className="ml-auto text-sm font-normal text-[#b3b3b3]">
-                {members.filter(m => m.isOnline).length} online
+                {members.length} online
               </span>
             </h2>
 
             <div className="mt-4 flex flex-col gap-1">
-              {members
-                .sort((a, b) => {
-                  if (a.isHost) return -1;
-                  if (b.isHost) return 1;
-                  if (a.isOnline && !b.isOnline) return -1;
-                  if (!a.isOnline && b.isOnline) return 1;
-                  return 0;
-                })
+              {[...members]
+                .sort((a, b) => (a.isHost ? -1 : b.isHost ? 1 : 0))
                 .map((member) => (
-                  <MemberItem key={member.id} {...member} />
+                  <MemberItem
+                    key={member.accountId}
+                    id={member.accountId}
+                    name={member.username}
+                    isHost={member.isHost}
+                    isOnline
+                  />
                 ))}
             </div>
 

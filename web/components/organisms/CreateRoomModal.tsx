@@ -11,7 +11,7 @@ interface CreateRoomModalProps {
   children: React.ReactNode;
 }
 
-async function createRoom(placeName: string, isPublic: boolean): Promise<string> {
+async function createRoom(placeName: string, isPublic: boolean): Promise<{ placeId: string; placeName: string }> {
   const res = await fetch("/api/musicroom/place/create", {
     method: "POST",
     credentials: "include",
@@ -22,7 +22,7 @@ async function createRoom(placeName: string, isPublic: boolean): Promise<string>
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message ?? "Failed to create room");
 
-  return body.placeId as string;
+  return { placeId: body.place.placeId, placeName: body.place.placeName };
 }
 
 export function CreateRoomModal({ children }: CreateRoomModalProps) {
@@ -51,10 +51,10 @@ export function CreateRoomModal({ children }: CreateRoomModalProps) {
     setLoading(true);
     setError(null);
     try {
-      const placeId = await createRoom(name.trim(), isPublic);
+      const { placeId, placeName: createdName } = await createRoom(name.trim(), isPublic);
       setSuccess(true);
       setTimeout(() => {
-        router.push(`/place/${placeId}`);
+        router.push(`/place/${placeId}?name=${encodeURIComponent(createdName)}`);
       }, 800);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred.");
